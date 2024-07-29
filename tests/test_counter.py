@@ -29,6 +29,8 @@ COUNTERS = {}
 # specify the variable in route <name>
 # let Flask know that the only methods allowed to call
 # this function are "POST".
+
+
 @app.route('/counters/<name>', methods=['POST'])
 def create_counter(name):
     """Create a counter"""
@@ -38,6 +40,7 @@ def create_counter(name):
         return {"Message":f"Counter {name} already exists"}, HTTP_409_CONFLICT
     COUNTERS[name] = 0
     return {name: COUNTERS[name]}, HTTP_201_CREATED
+
 
 @app.route('/counters/<name>', methods=['PUT'])
 def update_counter(name):
@@ -49,6 +52,7 @@ def update_counter(name):
     COUNTERS[name] += 1
     return {name: COUNTERS[name]}, HTTP_200_OK
 
+
 @app.route('/counters/<name>', methods=['GET'])
 def read_counter(name):
     """Read a counter"""
@@ -57,6 +61,17 @@ def read_counter(name):
     if name not in COUNTERS:
         return {"Message": f"Counter {name} does not exist"}, HTTP_404_NOT_FOUND
     return {name: COUNTERS[name]}, HTTP_200_OK
+
+@app.route('/counters/<name>', methods=['DELETE'])
+def delete_counter(name):
+    """Delete a counter"""
+    app.logger.info(f"Request to delete counter: {name}")
+    global COUNTERS
+    if name not in COUNTERS:
+        return {"Message": f"Counter {name} does not exist"}, HTTP_404_NOT_FOUND
+    del COUNTERS[name]
+    return '', HTTP_204_NO_CONTENT
+
 
 class CounterTest(TestCase):
     """Counter tests"""
@@ -102,3 +117,15 @@ class CounterTest(TestCase):
 
         data = result.get_json()
         self.assertEqual(data['baz'], 0)  # check for correct value
+
+    def test_delete_a_counter(self):
+        """It should delete a counter"""
+        result = self.client.post('/counters/bak')  # POST request for creation
+        self.assertEqual(result.status_code, HTTP_201_CREATED)
+
+        result = self.client.delete('/counters/bak')  # DELETE request to remove
+        self.assertEqual(result.status_code, HTTP_204_NO_CONTENT)  # 204 for no content
+
+        result = self.client.get('/counters/bak')  # GET request to confirm deletion
+        self.assertEqual(result.status_code, HTTP_404_NOT_FOUND)
+
