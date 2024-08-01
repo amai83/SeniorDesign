@@ -2,14 +2,19 @@
 #include <string>
 #include <cmath>
 #include <iomanip>
+
 using namespace std;
-int main()
-{
-    // declaring variables
-    double x1, y1, x2, y2;
-    double slope, yInt, manDist, eucDist;
+
+bool getInputAndValidate(double coords[2][2]);
+void calculateSlope(double coords[2][2]);
+void calculateManhattanDistance(double coords[2][2]);
+void calculateEuclideanDistance(double coords[2][2]);
+
+int main() {
+    double coords[2][2];
     char option;
-    // menu display
+    bool validInput;
+
     cout << "***************************************" << endl;
     cout << "* Welcome to the Distance Calculator *" << endl;
     cout << "***************************************" << endl;
@@ -17,140 +22,81 @@ int main()
     cout << "Manhattan Distance - (m/M)" << endl;
     cout << "Euclidean Distance - (e/E)" << endl;
     cout << "Quit - (q/Q)" << endl;
-    // user selects which calculation they want
-    cout << "Enter an Option:" << endl;
+
+    // User selects which calculation they want
+    cout << "Enter an Option: ";
     cin >> option;
-    // sets outputs to 3 decimals
+
+    // Sets outputs to 3 decimals
     cout << fixed << setprecision(3);
-    // the following section takes in and error checks user input for slope
-    switch (option)
-    {
-    case 's':
-    case 'S':
-        cout << "Enter a x1 value:" << endl;
-        cin >> x1;
-        if (x1 > 100)
-        {
-            cout << "Error: invalid x value, max is 100" << endl;
-            return 0;
-        }
-        cout << "Enter a y1 value:" << endl;
-        cin >> y1;
-        if (y1 > 150)
-        {
-            cout << "Error: invalid y value, max is 150" << endl;
-            return 0;
-        }
-        cout << "Enter a x2 value:" << endl;
-        cin >> x2;
-        if (x2 > 100)
-        {
-            cout << "Error: invalid x value, max is 100" << endl;
-            return 0;
-        }
-        cout << "Enter a y2 value:" << endl;
-        cin >> y2;
-        if (y2 > 150)
-        {
-            cout << "Error: invalid y value, max is 150" << endl;
-            return 0;
-        }
-        if (!cin)
-        {
-            cout << "Error: invalid input" << endl;
-            return 0;
-        }
-        slope = (y2 - y1) / (x2 - x1);
-        yInt = y1 - (slope * x1);
-        cout << "Slope: " << slope << endl;
-        cout << "Y-interecpt: " << yInt << endl;
-        break;
-    // the following section takes in and error checks user input for manDist
-    case 'm':
-    case 'M':
-        cout << "Enter a x1 value:" << endl;
-        cin >> x1;
-        if (x1 > 100)
-        {
-            cout << "Error: invalid x value, max is 100" << endl;
-            return 0;
-        }
-        cout << "Enter a y1 value:" << endl;
-        cin >> y1;
-        if (y1 > 150)
-        {
-            cout << "Error: invalid y value, max is 150" << endl;
-            return 0;
-        }
-        cout << "Enter a x2 value:" << endl;
-        cin >> x2;
-        if (x2 > 100)
-        {
-            cout << "Error: invalid x value, max is 100" << endl;
-            return 0;
-        }
-        cout << "Enter a y2 value:" << endl;
-        cin >> y2;
-        if (y2 > 150)
-        {
-            cout << "Error: invalid y value, max is 150" << endl;
-            return 0;
-        }
-        if (!cin)
-        {
-            cout << "Error: invalid input" << endl;
-            return 0;
-        }
-        manDist = abs(x2 - x1) + abs(y2 - y1);
-        cout << "Manhattan Distance: " << manDist << endl;
-        break;
-    // the following section takes in and error checks user input for eucDist
-    case 'e':
-    case 'E':
-        cout << "Enter a x1 value:" << endl;
-        cin >> x1;
-        if (x1 > 100)
-        {
-            cout << "Error: invalid x value, max is 100" << endl;
-            return 0;
-        }
-        cout << "Enter a y1 value:" << endl;
-        cin >> y1;
-        if (y1 > 150)
-        {
-            cout << "Error: invalid y value, max is 150" << endl;
-            return 0;
-        }
-        cout << "Enter a x2 value:" << endl;
-        cin >> x2;
-        if (x2 > 100)
-        {
-            cout << "Error: invalid x value, max is 100" << endl;
-            return 0;
-        }
-        cout << "Enter a y2 value:" << endl;
-        cin >> y2;
-        if (y2 > 150)
-        {
-            cout << "Error: invalid y value, max is 150" << endl;
-            return 0;
-        }
-        if (!cin)
-        {
-            cout << "Error: invalid input" << endl;
-            return 0;
-        }
-        eucDist = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-        cout << "Euclidean Distance: " << eucDist << endl;
-        break;
-    // The following section is the output if quit is selected
-    case 'q':
-    case 'Q':
-        cout << "Thank you for using the Distance Calculator" << endl;
-        break;
-    // The following section is if the user inputs something invalid
-    default:
-        cout << "Error: Invalid selection" << endl;
+
+    // Validate and get input
+    validInput = getInputAndValidate(coords);
+    if (!validInput) {
+        cout << "Error: Invalid input" << endl;
+        return 0;
     }
+
+    // Processing based on user option
+    switch (option) {
+        case 's':
+        case 'S':
+            calculateSlope(coords);
+            break;
+        case 'm':
+        case 'M':
+            calculateManhattanDistance(coords);
+            break;
+        case 'e':
+        case 'E':
+            calculateEuclideanDistance(coords);
+            break;
+        case 'q':
+        case 'Q':
+            cout << "Thank you for using the Distance Calculator" << endl;
+            break;
+        default:
+            cout << "Error: Invalid selection" << endl;
+    }
+
     return 0;
+}
+
+bool getInputAndValidate(double coords[2][2]) {
+    for (int i = 0; i < 2; ++i) {
+        cout << "Enter x" << i + 1 << " value: ";
+        cin >> coords[i][0];
+        if (coords[i][0] > 100 || !cin) {
+            return false;
+        }
+
+        cout << "Enter y" << i + 1 << " value: ";
+        cin >> coords[i][1];
+        if (coords[i][1] > 150 || !cin) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void calculateSlope(double coords[2][2]) {
+    double slope, yInt;
+    if (coords[1][0] == coords[0][0]) {
+        cout << "Error: Division by zero, x1 cannot be equal to x2 for slope calculation." << endl;
+        return;
+    }
+    slope = (coords[1][1] - coords[0][1]) / (coords[1][0] - coords[0][0]);
+    yInt = coords[0][1] - (slope * coords[0][0]);
+    cout << "Slope: " << slope << endl;
+    cout << "Y-intercept: " << yInt << endl;
+}
+
+void calculateManhattanDistance(double coords[2][2]) {
+    double manDist = abs(coords[1][0] - coords[0][0]) + abs(coords[1][1] - coords[0][1]);
+    cout << "Manhattan Distance: " << manDist << endl;
+}
+
+void calculateEuclideanDistance(double coords[2][2]) {
+    double eucDist = sqrt((coords[1][0] - coords[0][0]) * (coords[1][0] - coords[0][0]) + (coords[1][1] - coords[0][1]) * (coords[1][1] - coords[0][1]));
+    cout << "Euclidean Distance: " << eucDist << endl;
 }
