@@ -32,10 +32,12 @@ jobs:
 
         - name: Type check with mypy 
           run: |
+            pip install mypy
             mypy src
 
         - name: Security check with bandit
           run: |
+            pip install bandit
             bandit -r src
 
         - name: Run unit tests with nose
