@@ -30,6 +30,14 @@ jobs:
           run: |
             flake8 src --count --max-complexity=10 --max-line-length=127 --statistics
 
+        - name: Type check with mypy 
+          run: |
+            mypy src
+
+        - name: Security check with bandit
+          run: |
+            bandit -r src
+
         - name: Run unit tests with nose
           run: |
             nosetests -v --with-spec --spec-color --with-coverage --cover-package=app
